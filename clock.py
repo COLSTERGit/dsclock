@@ -18,7 +18,8 @@ background = pygame.image.load('dsclock.png')
 
 # Set up the display to be resizable
 size = 97  # Fixed dimensions (width and height)
-screen = pygame.display.set_mode((size, size), pygame.RESIZABLE)
+screen = pygame.Surface((97, 97))
+realscreen = pygame.display.set_mode((size, size), pygame.RESIZABLE)
 pygame.display.set_caption("Analog Clock")
 
 # Clock parameters (relative proportions)
@@ -61,15 +62,14 @@ def get_hand_position(center, length, angle):
 # Function to draw the clock
 def draw_clock(screen, size, hour, minute, second, alarm_hour, alarm_minute):
     # Scale the background image to the current window size
-    background_scaled = pygame.transform.scale(background, (size, size))
-    screen.blit(background_scaled, (0, 0))
+    screen.blit(background, (0, 0))
 
     # Recalculate the center and hand lengths based on the new window size
-    center = (size // 2, size // 2)
-    hour_hand_length = int((hour_hand_length_ratio * size))
-    minute_hand_length = int((minute_hand_length_ratio * size))
-    second_hand_length = int((second_hand_length_ratio * size))
-    center_square_size = int(center_square_size_ratio * size)
+    center = (48, 48)
+    hour_hand_length = int((hour_hand_length_ratio * 97))
+    minute_hand_length = int((minute_hand_length_ratio * 97))
+    second_hand_length = int((second_hand_length_ratio * 97))
+    center_square_size = int(center_square_size_ratio * 97)
 
     # Calculate angles for the hands
     second_angle = 360 * (second / 60)
@@ -105,7 +105,7 @@ while running:
         elif event.type == pygame.VIDEORESIZE:  # Handle window resizing
             new_size = min(event.w, event.h)  # Maintain square aspect ratio
             size = max(new_size, 97)  # Ensure a minimum size
-            screen = pygame.display.set_mode((size, size), pygame.RESIZABLE)
+            realscreen = pygame.display.set_mode((size, size), pygame.RESIZABLE)
 
     # Get current time
     t = time.localtime()
@@ -130,6 +130,8 @@ while running:
     draw_clock(screen, size, hour, minute, second, alarm_hour, alarm_minute)
 
     # Update display
+    
+    realscreen.blit(pygame.transform.scale(screen, realscreen.get_size()))
     pygame.display.flip()
 
     # Control the frame rate (1 frame per second)
